@@ -1,0 +1,790 @@
+const express = require('express')
+const app = express()
+const cors = require('cors')
+const PORT = 8000
+
+app.use(cors())
+
+const nationalparks = {
+    'acadia': {
+        'name': 'acadia national park',
+        'nps_website': 'https://www.nps.gov/acad/index.htm',
+        'image': '',
+        'description': 'Crown Jewel of the North Atlantic Coast',
+        'about': "Acadia National Park protects the natural beauty of the highest rocky headlands along the Atlantic coastline of the United States, an abundance of habitats, and a rich cultural heritage. At 4 million visits a year, it's one of the top 10 most-visited national parks in the United States. Visitors enjoy 27 miles of historic motor roads, 158 miles of hiking trails, and 45 miles of carriage roads.",
+        'street': '25 Visitor Center Rd',
+        'city': 'Bar Harbor',
+        'state': 'ME',
+        'postal_code': '04609',
+        'visitor_center': 'Hulls Cove Visitor Center',
+    },
+    'arches': {
+        'name': 'arches national park',
+        'nps_website': 'https://www.nps.gov/arch/index.htm',
+        'image': '',
+        'description': 'A red-rock wonderland',
+        'about': 'Discover a landscape of contrasting colors, land forms, and textures unlike any other. The park has over 2,000 natural stone arches, hundreds of soaring pinnacles, massive rock fins, and giant balanced rocks. This red-rock wonderland will amaze you with its formations, refresh you with its trails, and inspire you with its sunsets.',
+        'street': 'Arches Entrance Rd',
+        'city': 'Moab',
+        'state': 'UT',
+        'postal_code': '84532',
+        'vistor_center': 'Arches National Park Visitor Center'
+    },
+    'badlands': {
+        'name': 'badlands national park',
+        'nps_website': 'https://www.nps.gov/badl/index.htm',
+        'image': '',
+        'description': 'Land of Stone and Light',
+        'about': "The rugged beauty of the Badlands draws visitors from around the world. These striking geologic deposits contain one of the world's richest fossil beds. Ancient horses and rhinos once roamed here. The park's 244,000 acres protect an expanse of mixed-grass prairie where bison, bighorn sheep, prairie dogs, and black-footed ferrets live today.",
+        'street': '25216 Ben Reifel Road',
+        'city': 'Interior',
+        'state': 'SD',
+        'postal_code': '57750',
+        'vistor_center': ['Ben Reifel Visitor Center', 'White River Visitor Center']
+    },
+    'big bend': {
+        'name': 'big bend national park',
+        'nps_website': 'https://www.nps.gov/bibe/index.htm',
+        'image': '',
+        'description': 'Splendid Isolation: Big Bend',
+        'about': "There is a place in Far West Texas where night skies are dark as coal and rivers carve temple-like canyons in ancient limestone. Here, at the end of the road, hundreds of bird species take refuge in a solitary mountain range surrounded by weather-beaten desert. Tenacious cactus bloom in sublime southwestern sun, and diversity of species is the best in the country. This magical place is Big Bend...",
+        'street': '1 Panther Junction',
+        'city': 'Big Bend National Park',
+        'state': 'TX',
+        'postal_code': '79834',
+        'vistor_center': ['Panther Junction Visitor Center', 'Chisos Basin Visitor Center', 'Castolon Visitor Center', 'Persimmon Gap Visitor Center', 'Rio Grande Village Visitor Center']
+    },
+    'biscayne': {
+        'name': 'biscayne national park',
+        'nps_website': 'https://www.nps.gov/bisc/index.htm',
+        'image': '',
+        'description': 'A Watery Wonderland',
+        'about': "Within sight of Miami, yet worlds away, Biscayne protects a rare combination of aquamarine waters, emerald islands, and fish-bejeweled coral reefs. Evidence of 10,000 years of human history is here too; from prehistoric tribes to shipwrecks, and pineapple farmers to presidents. For many, the park is a boating, fishing, and diving destination, while others enjoy a warm breeze and peaceful scenery.",
+        'street': '9700 SW 328th Street',
+        'additional_street': 'Sir Lancelot Jones Way',
+        'city': 'Homestead',
+        'state': 'FL',
+        'postal_code': '33033',
+        'vistor_center': 'Dante Fascell Visitor Center'
+    },
+    'black canyon of the gunnison': {
+        'name': 'black canyon of the gunnison national park',
+        'nps_website': 'https://www.nps.gov/blca/index.htm',
+        'image': '',
+        'description': 'Deep, Steep and Narrow',
+        'about': "Big enough to be overwhelming, still intimate enough to feel the pulse of time, Black Canyon of the Gunnison National Park exposes you to some of the steepest cliffs, oldest rock, and craggiest spires in North America. With two million years to work, the Gunnison River, along with the forces of weathering, has sculpted this vertical wilderness of rock, water, and sky.",
+        'street': '9800 Highway 347',
+        'city': 'Montrose',
+        'state': 'CO',
+        'postal_code': '81401',
+        'vistor_center': 'South Rim Visitor Center'
+    },
+    'bryce canyon': {
+        'name': 'bryce canyon national park',
+        'nps_website': 'https://www.nps.gov/brca/index.htm',
+        'image': '',
+        'description': 'Red Rocks, Pink Cliffs, and Endless Vistas',
+        'about': "Hoodoos (irregular columns of rock) exist on every continent, but here is the largest concentration found anywhere on Earth. Situated along a high plateau at the top of the Grand Staircase, the park's high elevations include numerous life communities, fantastic dark skies, and geological wonders that defy description.",
+        'street': 'Bryce Canyon National Park',
+        'city': 'Bryce',
+        'state': 'UT',
+        'postal_code': '84764',
+        'vistor_center': null,
+    },
+    'canyonlands': {
+        'name': 'national park',
+        'nps_website': 'https://www.nps.gov/cany/index.htm',
+        'image': '',
+        'description': 'A Lifetime of Exploration Awaits',
+        'about': "Canyonlands invites you to explore a wilderness of countless canyons and fantastically formed buttes carved by the Colorado River and its tributaries. Rivers divide the park into four districts: Island in the Sky, The Needles, The Maze, and the rivers themselves. These areas share a primitive desert atmosphere, but each offers different opportunities for sightseeing and adventure.",
+        'street': 'Grand View Point Rd',
+        'city': 'Moab',
+        'state': 'UT',
+        'postal_code': '84532',
+        'vistor_center': ['Island in the Sky Visitor Center', 'The Needles Visitor Center', 'Hans Flat Ranger Station', 'Canyonlands Backcountry Office']
+    },
+    'capitol reef': {
+        'name': 'capitol reef national park',
+        'nps_website': 'https://www.nps.gov/care/index.htm',
+        'image': '',
+        'description': 'Discover the Waterpocket Fold, a geologic wrinkle on earth!',
+        'about': "Located in south-central Utah in the heart of red rock country, Capitol Reef National Park is a hidden treasure filled with cliffs, canyons, domes, and bridges in the Waterpocket Fold, a geologic monocline (a wrinkle on the earth) extending almost 100 miles.",
+        'street': '52 West Headquarters Drive',
+        'city': 'Torrey',
+        'state': 'UT',
+        'postal_code': '84775',
+        'vistor_center': 'Capitol Reef National Park Visitor Center'
+    },
+    'carlsbad caverns': {
+        'name': 'carlsbad caverns national park',
+        'nps_website': '',
+        'image': '',
+        'description': 'Beauty and Wonder; Above and Below',
+        'about': "High ancient sea ledges, deep rocky canyons, flowering cactus, and desert wildlife—treasures above the ground in the Chihuahuan Desert. Hidden beneath the surface are more than 119 caves—formed when sulfuric acid dissolved limestone leaving behind caverns of all sizes.",
+        'directions': "To access the park's only entrance road, New Mexico Highway 7, turn north from US Hwy 62/180 at White's City, NM, which is 20 miles (32 km) southwest of Carlsbad, NM and 145 miles (233 km) northeast of El Paso, TX. The entrance road stretches a scenic seven miles (11.3 km) from the park gate at White's City to the visitor center and cavern entrance. The address for the park's visitor center is 727 Carlsbad Caverns Hwy, Carlsbad, NM, 88220, located 27 miles (43 km) from the town of Carlsbad.",
+        'street': '727 Carlsbad Caverns Highway',
+        'city': 'Carlsbad',
+        'state': 'NM',
+        'postal_code': '88220',
+        'vistor_center': null
+    },
+    'channel islands': {
+        'name': 'channel islands national park',
+        'nps_website': 'https://www.nps.gov/chis/index.htm',
+        'image': '',
+        'description': 'Close to the California Mainland...Yet Worlds Apart',
+        'about': "Channel Islands National Park encompasses five remarkable islands and their ocean environment, preserving and protecting a wealth of natural and cultural resources. Isolation over thousands of years has created unique animals, plants, and archeological resources found nowhere else on Earth and helped preserve a place where visitors can experience coastal southern California as it once was.",
+        'street': '1901 Spinnaker Drive',
+        'city': 'Ventura',
+        'state': 'CA',
+        'postal_code': '93001',
+        'vistor_center': ['Channel Islands National Park Visitor Center', 'Outdoors Santa Barbara Visitor Center', 'Visitor Center Anacapa Island', 'Santa Barbara Island Visitor Center', 'Scorpion Ranch Visitor Center on Santa Cruz Island', 'Santa Rosa Island Visitor Contact Station', 'San Miguel Island Ranger and Vistor Contact Station']
+    },
+    'congaree': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'crater lake': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'cuyahoga valley': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'death valley': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'denali': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'dry tortugas': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'everglades': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'gates of the arctic': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'gateway arch': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'glacier': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'glacier bay': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'grand canyon': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'grand teton': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'great basin': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'great sand dunes': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'great smoky mountains': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'guadalupe mountains': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'haleakala': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'hawaii valcanoes': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'hot springs': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'indiana dunes': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'isle royale': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'joshua tree': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'katmai': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'kenai fjords': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'kings canyon': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'kobuk valley': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'lake clark': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'lassen volcanic': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'mammoth cave': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'mesa verde': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'mount rainier': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'new river gorge': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'north cascades': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'organ pipe cactus': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'olympic': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'petrified forest': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'pinnacles': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'redwood': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'rocky mountain': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'saguaro': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'sequoia': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'shenandoah': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'theodore roosevelt': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'virgin islands': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'voyageurs': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'white sands': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'wind cave': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'wrangell st. elias': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'yellowstone': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'yosemite': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    },
+    'zion': {
+        'name': 'national park',
+        'nps_website': '',
+        'image': '',
+        'description': '',
+        'about': "",
+        'street': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+        'vistor_center': ''
+    }
+}
+
+app.get('/', (request, response) => {
+    response.sendFile(__dirname + '/index.html')
+})
+
+app.get('/api', (request, response) => {
+    response.json(nationalparks)
+})
+
+app.get('/api/:name', (request, response) => {
+    const parkName = request.params.name.toLowerCase()
+
+    if(nationalparks[parkName] ){
+        response.json(nationalparks[parkName])
+    }else{
+        response.json(nationalparks['unknown'])
+    }
+
+})
+
+app.listen(process.env.PORT || PORT, () => {
+    console.log(`The server is running on port ${PORT}`)
+})
